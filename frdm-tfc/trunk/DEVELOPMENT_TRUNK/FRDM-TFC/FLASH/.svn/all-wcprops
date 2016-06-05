@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/13/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH
+END
+makefile
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/10/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/makefile
+END
+objects.mk
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/2/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/objects.mk
+END
+FRDM-TRC.elf
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/13/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/FRDM-TRC.elf
+END
+makefile.local
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/10/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/makefile.local
+END
+FRDM-TRC.args
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/11/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/FRDM-TRC.args
+END
+sources.mk
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/2/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/sources.mk
+END
+FRDM-TRC.map
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/13/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/FRDM-TRC.map
+END

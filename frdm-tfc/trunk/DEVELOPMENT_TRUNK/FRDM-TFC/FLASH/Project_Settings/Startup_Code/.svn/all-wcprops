@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/11/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/Project_Settings/Startup_Code
+END
+subdir.mk
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/!svn/ver/10/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/Project_Settings/Startup_Code/subdir.mk
+END
+__arm_end.args
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/!svn/ver/10/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/Project_Settings/Startup_Code/__arm_end.args
+END
+__arm_end.o.lst
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/!svn/ver/11/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/Project_Settings/Startup_Code/__arm_end.o.lst
+END
+kinetis_sysinit.args
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/!svn/ver/10/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/Project_Settings/Startup_Code/kinetis_sysinit.args
+END
+__arm_end.d
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/!svn/ver/11/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/Project_Settings/Startup_Code/__arm_end.d
+END
+__arm_start.args
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/!svn/ver/10/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/Project_Settings/Startup_Code/__arm_start.args
+END
+kinetis_sysinit.o.lst
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/!svn/ver/11/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/Project_Settings/Startup_Code/kinetis_sysinit.o.lst
+END
+__arm_start.o.lst
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/!svn/ver/11/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/Project_Settings/Startup_Code/__arm_start.o.lst
+END
+kinetis_sysinit.d
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/!svn/ver/11/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/Project_Settings/Startup_Code/kinetis_sysinit.d
+END
+__arm_start.d
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/!svn/ver/11/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/FLASH/Project_Settings/Startup_Code/__arm_start.d
+END

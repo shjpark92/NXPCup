@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/14/trunk/RELEASES/R1.0/FRDM-TFC/Project_Settings/Debugger
+END
+MKL25Z128.mem
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/14/trunk/RELEASES/R1.0/FRDM-TFC/Project_Settings/Debugger/MKL25Z128.mem
+END
+FRDM-TRC_FLASH_OpenSDA.launch
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/!svn/ver/14/trunk/RELEASES/R1.0/FRDM-TFC/Project_Settings/Debugger/FRDM-TRC_FLASH_OpenSDA.launch
+END
+FRDM-TRC_FLASH_OpenSDA.pemicro
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/!svn/ver/14/trunk/RELEASES/R1.0/FRDM-TFC/Project_Settings/Debugger/FRDM-TRC_FLASH_OpenSDA.pemicro
+END
+mass_erase_kinetis.tcl
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/14/trunk/RELEASES/R1.0/FRDM-TFC/Project_Settings/Debugger/mass_erase_kinetis.tcl
+END
+init_kinetis.tcl
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/!svn/ver/14/trunk/RELEASES/R1.0/FRDM-TFC/Project_Settings/Debugger/init_kinetis.tcl
+END

@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/!svn/ver/2/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/Project_Settings/Startup_Code
+END
+__arm_end.c
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/!svn/ver/2/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/Project_Settings/Startup_Code/__arm_end.c
+END
+kinetis_sysinit.c
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/!svn/ver/2/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/Project_Settings/Startup_Code/kinetis_sysinit.c
+END
+__arm_start.c
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/!svn/ver/2/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/Project_Settings/Startup_Code/__arm_start.c
+END
+kinetis_sysinit.h
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/!svn/ver/2/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/Project_Settings/Startup_Code/kinetis_sysinit.h
+END
+runtime_configuration.h
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/!svn/ver/2/trunk/DEVELOPMENT_TRUNK/FRDM-TFC/Project_Settings/Startup_Code/runtime_configuration.h
+END
