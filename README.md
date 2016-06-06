@@ -25,3 +25,6 @@
 * ReferencedRSESystems.xml
 * Sources/*
 
+### Notes ###
+
+* Directories are structures around Code Warrior for MCU 10.6 - the main IDE used for this competition. 
