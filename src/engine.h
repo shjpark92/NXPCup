@@ -67,8 +67,7 @@
 //
 // *******************************************
 //
-void MasterControlProgram();
-
+void ExecuteEngine();
 
 // prints out line scan data for you
 void printLineScanData(uint16_t *LineScanData);

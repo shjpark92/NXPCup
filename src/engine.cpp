@@ -184,7 +184,6 @@ struct LogData {
 LogData    frameLogs[NUM_LOG_FRAMES];              // array of log data to store  
 int        logDataIndex;                           // index for log data
 
-
 int        StartGateFoundCount = 0;                // how many times start gate has been found
 int        UnknownCount = 0;                       // how many times nothing has been found (to help with kill switch implementation)
 bool       go = false;                             // Car can go!  Should be set to false to start.
@@ -206,8 +205,7 @@ Timer timer;
 int after_time, before_time, start_time, last_start_time;
 bool run_once = false;
 
-void MasterControlProgram()
-{
+void ExecuteEngine() {
 
   // put here all things want to run only once after reset
   if (!run_once){
@@ -370,10 +368,9 @@ void MasterControlProgram()
    } 
 }
 
-void dumpData()
-{
-   TERMINAL_PRINTF("INDEX,LINEPOS,STEERSETTING,LEFTDRIVESETTING,RIGHTDRIVESETTING\r\n");
-       for(logDataIndex=0;logDataIndex<NUM_LOG_FRAMES;logDataIndex++) {
+void dumpData() {
+   TERMINAL_PRINTF("INDEX, LINEPOS, STEERSETTING, LEFTDRIVESETTING, RIGHTDRIVESETTING\r\n");
+       for(logDataIndex = 0; logDataIndex < NUM_LOG_FRAMES; logDataIndex++) {
          TERMINAL_PRINTF("%d,%6.2f,%6.2f,%6.2f,%6.2f\r\n",logDataIndex,frameLogs[logDataIndex].linepos,frameLogs[logDataIndex].steersetting,frameLogs[logDataIndex].leftdrivesetting,frameLogs[logDataIndex].rightdrivesetting);
        }
 }
