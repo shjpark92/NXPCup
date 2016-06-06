@@ -9,7 +9,7 @@
 
 * Jun Qi Lau
 * Sung Hyun Park
-* Michael Ji Park
+* Michael Park
 * Krishna Nadoli
 
 ### Files Contained ###
