@@ -14,17 +14,17 @@
 
 ### Files Contained ###
 
-* .cproject
-* .cwGeneratedFileSetLog
-* .project
-* .settings/*
 * Documentation/*
 * LabVIEW/*
-* Project_Headers/*
-* Project_Settings/*
-* ReferencedRSESystems.xml
-* Sources/*
+* old/*
+* src/common.cpp
+* src/common.h
+* src/main.cpp
+* src/FRDM-TFC/TFC.cpp
+* src/FRDM-TFC/TFC.h
+* src/Spices/Spices.cpp
+* src/Spices/Spirces.h
 
 ### Notes ###
 
-* Directories are structures around Code Warrior for MCU 10.6 - the main IDE used for this competition. 
+* Directories are structures around mbed - the main IDE used for this competition. 
