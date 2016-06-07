@@ -16,44 +16,43 @@
 float CURRENT_STEER = -0.21; // (MAX_STEER_RIGHT + MAX_STEER_LEFT) / 2
 float MAX_SPEED     =  0.00;
 int   RUNNING = 0;
-int delay = 10;
+int   delay = 10;
 
 void GetCurrentSteer() {
-    uint32_t i, j;
-    short TFC_LineScanImage_bin[CAMERA_BUFFER_SIZE];
-    short leftAccumulate, rightAccumulate;
+    uint32_t line, column, index = 0;
+    uint16_t TFC_LineScanImage_bin[CAMERA_BUFFER_SIZE];
+    uint16_t leftAccumulate = 0, rightAccumulate = 0;
     float difference;
 
-    if(TFC_Ticker[0] > 1000 && TFC_LineScanImageReady > 0) { // every 2s ...
-        TFC_Ticker[0] = 0;
-        TFC_LineScanImageReady = 0; // must reset to 0 after detecting non-zero
-        TFC_SetBatteryLED_Level(4);
+    TFC_SetBatteryLED_Level(4);
 
-        for(i = 0; i < 8; i++) { // print one line worth of data (128) from Camera 0
-            for(j = 0; j < 16; j++) {
-                if (TFC_LineScanImage0[(i * 16) + j] > 0x110) {
-                    TFC_LineScanImage_bin[i * 16 + j] = 1;
-                }
-                else {
-                    TFC_LineScanImage_bin[i * 16 + j] = 0;
-                }
-                /*if((i == 7) && (j == 15)) {  // when last data reached put in line return
-                //   TERMINAL_PRINTF("\r\n",TFC_LineScanImage0[(i * 16) + j]);
-                }
-                else {
-                //   TERMINAL_PRINTF(", ",TFC_LineScanImage0[(i * 16) + j]);
-                }*/
+    for(line = 0; line < 8; ++line) { // print one line worth of data (128) from Camera 0
+        for(column = 0; column < 16; ++column) {
+
+            if (TFC_LineScanImage0[(line * 16) + column] > 0x250) {
+                TFC_LineScanImage_bin[line * 16 + column] = 0x01;
             }
+            else {
+                TFC_LineScanImage_bin[line * 16 + column] = 0x00;
+            }
+            TERMINAL_PRINTF("%X", TFC_LineScanImage_bin[(i * 16) + j]);
         }
     }
 
-    for(int i = 0; i < CAMERA_BUFFER_MID; ++i) {
-        leftAccumulate += TFC_LineScanImage_bin[i];
+
+    for(index = 0; index < CAMERA_BUFFER_MID; ++index) {
+        leftAccumulate += TFC_LineScanImage_bin[index];
+        //TERMINAL_PRINTF("%i", TFC_LineScanImage_bin[index]);
     }
     do {
-      rightAccumulate += TFC_LineScanImage_bin[i];
-      ++i;
-    } while(i < CAMERA_BUFFER_SIZE);
+        rightAccumulate += TFC_LineScanImage_bin[index];
+        //TERMINAL_PRINTF("%i", TFC_LineScanImage_bin[index]);
+        ++index;
+    } while(index < CAMERA_BUFFER_SIZE);
+
+    TERMINAL_PRINTF("Left: %i\r\n", leftAccumulate);
+    TERMINAL_PRINTF("Right: %i\r\n", rightAccumulate);
+    TERMINAL_PRINTF("Index: %i\r\n", index);
 
     difference = rightAccumulate - leftAccumulate;
     CURRENT_STEER = difference * 1.5 + DEFAULT_STEER; 
@@ -64,13 +63,7 @@ void SetMaxSpeed() {
 }
 
 void SetSteer() {
-    if(delay == 0) {
-        GetCurrentSteer();
-        delay = 10;
-    }
-    else {
-        delay--;
-    }
+    GetCurrentSteer();
 
     // Set New Steer Value
     if (CURRENT_STEER > MAX_STEER_RIGHT) { 
@@ -94,8 +87,8 @@ void ExecuteEngine() {
         TFC_BAT_LED2_ON;
         TFC_BAT_LED3_ON;
         SetMaxSpeed();
-        SetSteer();
-        RUNNING = 1;
+
+        RUNNING |= 0x01;
         TFC_HBRIDGE_ENABLE;
         TFC_SetMotorPWM(MAX_SPEED, MAX_SPEED);
     }
@@ -106,12 +99,14 @@ void ExecuteEngine() {
         TFC_BAT_LED2_OFF;
         TFC_BAT_LED3_OFF;
 
+        RUNNING &= ~0xFF;
         TFC_SetMotorPWM(0, 0);
         TFC_HBRIDGE_DISABLE;
     }
-    if (RUNNING) {
-        SetSteer();
-        TFC_BAT_LED0_ON;
-    }
 
+    if(TFC_LineScanImageReady && RUNNING) {
+        // Disarm LineScanImageReady
+        TFC_LineScanImageReady &= ~0xFF;
+        SetSteer();
+    }
 }

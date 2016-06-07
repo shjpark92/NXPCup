@@ -105,7 +105,7 @@ void CalibrateCamera() {
         for(i = 0; i < 8; i++) { // print one line worth of data (128) from Camera 0
             for(j = 0; j < 16; j++) {
   
-                    if (TFC_LineScanImage0[(i * 16) + j] > 0x110) TFC_LineScanImage_bin[i * 16 + j] = 1;
+                    if (TFC_LineScanImage0[(i * 16) + j] > 0x250) TFC_LineScanImage_bin[i * 16 + j] = 1;
                     else TFC_LineScanImage_bin[i * 16 + j] = 0;
 
                     //TERMINAL_PRINTF("0x%X", TFC_LineScanImage0[(i * 16) + j]);
@@ -119,7 +119,11 @@ void CalibrateCamera() {
                     }
             }
             wait_ms(50);
-        } 
+        }
+
+        for (i = 0; i < 128; ++i) {
+            TERMINAL_PRINTF("bin: %i\r\n", TFC_LineScanImage_bin[i]);
+        }
         TERMINAL_PRINTF("\r\n");
     }
 }
@@ -195,8 +199,8 @@ int main() {
 
         // If DIP switch 1 is high, then run MCP, else Demo program
         if(TFC_GetDIP_Switch() & 0x01) {
-            //ExecuteEngine();
-            ExecutePrototype();
+            ExecuteEngine();
+            //ExecutePrototype();
         }
         else {     
             ExecuteCalibration();
