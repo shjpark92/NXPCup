@@ -96,6 +96,7 @@ void CalibrateMotors() {
  *******************************************************/
 void CalibrateCamera() {
     uint32_t i, j, t = 0;
+    short TFC_LineScanImage_bin[128];
 
     if(TFC_Ticker[0] > 1000 && TFC_LineScanImageReady > 0) { // every 2s ...
         TFC_Ticker[0] = 0;
@@ -103,16 +104,23 @@ void CalibrateCamera() {
         TFC_SetBatteryLED_Level(4);
         for(i = 0; i < 8; i++) { // print one line worth of data (128) from Camera 0
             for(j = 0; j < 16; j++) {
-                    TERMINAL_PRINTF("0x%X", TFC_LineScanImage0[(i * 16) + j]);
+  
+                    if (TFC_LineScanImage0[(i * 16) + j] > 0x110) TFC_LineScanImage_bin[i*16 + j] = 1;
+                    else TFC_LineScanImage_bin[i*16 + j] = 0;
+
+                    //TERMINAL_PRINTF("0x%X", TFC_LineScanImage0[(i * 16) + j]);
+                    TERMINAL_PRINTF("%X", TFC_LineScanImage_bin[(i * 16) + j]);
+                    
                     if((i == 7) && (j == 15)) {  // when last data reached put in line return
-                       TERMINAL_PRINTF("\r\n",TFC_LineScanImage0[(i * 16) + j]);
+                    //   TERMINAL_PRINTF("\r\n",TFC_LineScanImage0[(i * 16) + j]);
                     }
                     else {
-                       TERMINAL_PRINTF(", ",TFC_LineScanImage0[(i * 16) + j]);
+                    //   TERMINAL_PRINTF(", ",TFC_LineScanImage0[(i * 16) + j]);
                     }
             }
             wait_ms(50);
         } 
+        TERMINAL_PRINTF("\r\n");
     }
 }
 
@@ -177,14 +185,15 @@ void ExecutePrototype() {
 
 int main() {
     //PC.baud(115200); // Excel and TeraTerm 
-    PC.baud(9600);     // UNIX - screen /var/tty.usbmodem*
-    TFC_TickerObj.attach_us(&TFC_TickerUpdate, 2000); // update ticker array every 2ms (2000 us)
+    PC.baud(9600);     // UNIX - screen /var/tty.usbmodem* -s 9600
+    TFC_TickerObj.attach_us(&TFC_TickerUpdate, 2000); // update ticker array every 2mS (2000 uS)
     TFC_Init();
     
     while(1) {      
-        //TFC_Task must be called in your main loop.  This keeps certain processing happy (i.e. Serial port queue check)
+        //TFC_Task must be called in your main loop.  This keeps certain processing happy (I.E. Serial port queue check)
         //TFC_Task();
 
+        // If DIP switch 1 is high, then run MCP, else Demo program
         if(TFC_GetDIP_Switch() & 0x01) {
             //ExecuteEngine();
             ExecutePrototype();
