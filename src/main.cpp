@@ -1,6 +1,5 @@
 #include "mbed.h"
 #include "TFC.h"
-#include "calibrate.h"
 #include "common.h"
 #include "engine.h"
 
@@ -97,6 +96,8 @@ void CalibrateMotors() {
 void CalibrateCamera() {
     uint32_t i, j, t = 0;
     short TFC_LineScanImage_bin[128];
+
+    TFC_LineScanImageReady = 1;
 
     if(TFC_Ticker[0] > 1000 && TFC_LineScanImageReady > 0) { // every 2s ...
         TFC_Ticker[0] = 0;
@@ -195,8 +196,8 @@ int main() {
 
         // If DIP switch 1 is high, then run MCP, else Demo program
         if(TFC_GetDIP_Switch() & 0x01) {
-            //ExecuteEngine();
-            ExecutePrototype();
+            ExecuteEngine();
+            //ExecutePrototype();
         }
         else {     
             ExecuteCalibration();

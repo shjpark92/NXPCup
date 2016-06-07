@@ -24,6 +24,8 @@ void GetCurrentSteer() {
     short leftAccumulate, rightAccumulate;
     float difference;
 
+    TFC_LineScanImageReady = 1;
+
     if(TFC_Ticker[0] > 1000 && TFC_LineScanImageReady > 0) { // every 2s ...
         TFC_Ticker[0] = 0;
         TFC_LineScanImageReady = 0; // must reset to 0 after detecting non-zero
@@ -31,7 +33,7 @@ void GetCurrentSteer() {
 
         for(i = 0; i < 8; i++) { // print one line worth of data (128) from Camera 0
             for(j = 0; j < 16; j++) {
-                if (TFC_LineScanImage0[(i * 16) + j] > 0x110) {
+                if (TFC_LineScanImage0[(i * 16) + j] > 0x250) {
                     TFC_LineScanImage_bin[i * 16 + j] = 1;
                 }
                 else {
