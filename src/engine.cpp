@@ -15,8 +15,10 @@
 #define DER_RATIO 0.5                              // ratio for der threshold level (was 0.5 initially, may put back)
 
 // steer/servo params
-#define MAX_STEER_LEFT -0.51                       // value determined by demo mode 1 measure (have to be adjusted with every servo horn attach)
-#define MAX_STEER_RIGHT 0.39                       // value determined by demo mode 1 measure
+//#define MAX_STEER_LEFT -0.51                       // value determined by demo mode 1 measure (have to be adjusted with every servo horn attach)
+//#define MAX_STEER_RIGHT 0.39                       // value determined by demo mode 1 measure
+#define MAX_STEER_LEFT  -0.63
+#define MAX_STEER_RIGHT  0.22
 #define DT 0.02                                    // # MS of time between intervals (doesn't really matter)
 
 // logging parameters
@@ -190,7 +192,7 @@ bool       go = false;                             // Car can go!  Should be set
 
 // EXTRA CONTROL PARAMETERS
 bool debugFakeMode = false;         // if true, ignores real camera and uses fake camera input instead; used for data processing debug
-int terminalOutput = 0;             // set debug level for terminal output
+int terminalOutput = 2;             // set debug level for terminal output
                                     //    0 : no terminal output, race!
                                     //    1 : output just to measure frame rate
                                     //    2 : output for measuring time of operations
@@ -221,7 +223,7 @@ void ExecuteEngine() {
   // Every 4s (or Terminal Output is off, i.e. race mode!)
   //    AND line scan image ready (or fake mode where image is always ready)
   //   (ticker updates every 2ms) (Line scan image ready very 20mS?)
-  if((TFC_Ticker[0]>2000 || (terminalOutput != 3)) && (TFC_LineScanImageReady>0 || debugFakeMode))
+  if((TFC_Ticker[0] > 2000 || (terminalOutput != 3)) && (TFC_LineScanImageReady > 0 || debugFakeMode))
    {
 
      // stuff that needs to be reset with each image frame
@@ -1141,8 +1143,8 @@ void SpeedControl()
 
 
   // currently no control mechanism as don't have speed sensor  
-  CurrentLeftDriveSetting = (float) (LeftDriveRatio / 100) * MaxSpeed;
-  CurrentRightDriveSetting = (float) (RightDriveRatio / 100) * MaxSpeed;
+  CurrentLeftDriveSetting = (float) (LeftDriveRatio / 100) * MaxSpeed * -1;
+  CurrentRightDriveSetting = (float) (RightDriveRatio / 100) * MaxSpeed * -1;
 
   
   if (terminalOutput == 3) {
@@ -1207,61 +1209,57 @@ void Drive()
 }
 
 
-void adjustLights()
-{
+void adjustLights() {
+    // LIGHT ADJUST METHOD 1
+    // threshold is 1/5 of light intensity 'range'
+    if (1 == 0) {
+        DerivThreshold = (float) (MaxLightIntensity - MinLightIntensity) / 5;
+        NegDerivThreshold = (float) -1 * (DerivThreshold);
+        PosDerivThreshold = (float) (DerivThreshold);
+    } 
+    else {
+        // LIGHT ADJUST METHOD 2 -- SEEMS TO WORK MUCH BETTER
+        // pos edge threshold is half range of max deriv above aver derive
+        // neg edge threshold is half range of min deriv above aver derive
 
-  // LIGHT ADJUST METHOD 1
-  // threshold is 1/5 of light intensity 'range'
-  if (1 == 0) {
-    DerivThreshold = (float) (MaxLightIntensity - MinLightIntensity) / 5;
-    NegDerivThreshold = (float) -1 * (DerivThreshold);
-    PosDerivThreshold = (float) (DerivThreshold);
-  } else {
-  // LIGHT ADJUST METHOD 2 -- SEEMS TO WORK MUCH BETTER
-  // pos edge threshold is half range of max deriv above aver derive
-  // neg edge threshold is half range of min deriv above aver derive
-   
-    NegDerivThreshold = (float) (minDerVal - aveDerVal) * DER_RATIO;
-    PosDerivThreshold = (float) (maxDerVal - aveDerVal) * DER_RATIO;
-  
-  }
+        NegDerivThreshold = (float) (minDerVal - aveDerVal) * DER_RATIO;
+        PosDerivThreshold = (float) (maxDerVal - aveDerVal) * DER_RATIO;
 
-  printAdjustLightsData();
+    }
 
+    printAdjustLightsData();
 }
 
-void printAdjustLightsData()
-{
-  if (terminalOutput == 3) {
-    TERMINAL_PRINTF("Max Light Intensity: %4d\r\n", MaxLightIntensity);
-    TERMINAL_PRINTF("Min Light Intensity: %4d\r\n", MinLightIntensity);
-    TERMINAL_PRINTF("Deriv Threshold: %9.3f\r\n", DerivThreshold);
-  }
-
+void printAdjustLightsData() {
+    if (terminalOutput == 3) {
+        TERMINAL_PRINTF("Max Light Intensity: %4d\r\n", MaxLightIntensity);
+        TERMINAL_PRINTF("Min Light Intensity: %4d\r\n", MinLightIntensity);
+        TERMINAL_PRINTF("Deriv Threshold: %9.3f\r\n", DerivThreshold);
+    }
 }
 
-void feedbackLights()
-{
-   switch (CurrentTrackStatus)
-   {
-     case LineFound:
-       TFC_BAT_LED0_OFF;
-       TFC_BAT_LED1_ON;     
-       TFC_BAT_LED2_ON;
-       TFC_BAT_LED3_OFF;
-       break;
-     case StartGateFound:
-       TFC_BAT_LED0_ON;
-       TFC_BAT_LED1_OFF;     
-       TFC_BAT_LED2_OFF;
-       TFC_BAT_LED3_ON;   
-       break;
-     default:
-       TFC_BAT_LED0_OFF;
-       TFC_BAT_LED1_OFF;     
-       TFC_BAT_LED2_OFF;
-       TFC_BAT_LED3_OFF;
-   }
+void feedbackLights() {
+    switch (CurrentTrackStatus) {
+        case LineFound:
+            TFC_BAT_LED0_OFF;
+            TFC_BAT_LED1_ON;     
+            TFC_BAT_LED2_ON;
+            TFC_BAT_LED3_OFF;
+        break;
+
+        case StartGateFound:
+            TFC_BAT_LED0_ON;
+            TFC_BAT_LED1_OFF;     
+            TFC_BAT_LED2_OFF;
+            TFC_BAT_LED3_ON;   
+        break;
+
+        default:
+            TFC_BAT_LED0_OFF;
+            TFC_BAT_LED1_OFF;     
+            TFC_BAT_LED2_OFF;
+            TFC_BAT_LED3_OFF;
+    }
     
 }
 

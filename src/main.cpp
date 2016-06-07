@@ -178,14 +178,13 @@ void ExecutePrototype() {
 int main() {
     //PC.baud(115200); // Excel and TeraTerm 
     PC.baud(9600);     // UNIX - screen /var/tty.usbmodem*
-    TFC_TickerObj.attach_us(&TFC_TickerUpdate, 2000); // update ticker array every 2mS (2000 uS)
+    TFC_TickerObj.attach_us(&TFC_TickerUpdate, 2000); // update ticker array every 2ms (2000 us)
     TFC_Init();
     
     while(1) {      
-        //TFC_Task must be called in your main loop.  This keeps certain processing happy (I.E. Serial port queue check)
+        //TFC_Task must be called in your main loop.  This keeps certain processing happy (i.e. Serial port queue check)
         //TFC_Task();
 
-        // If DIP switch 1 is high, then run MCP, else Demo program
         if(TFC_GetDIP_Switch() & 0x01) {
             //ExecuteEngine();
             ExecutePrototype();
