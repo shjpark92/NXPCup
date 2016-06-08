@@ -1,209 +1,240 @@
 #include "mbed.h"
 #include "TFC.h"
-#include "calibrate.h"
 #include "common.h"
-#include "engine.h"
+#include "Spices.h"
 
-float PROTO_MAX_SPEED = 0.0;
+// 5 MODES OR EXERCISES THAT WILL ALIGN WITH DIP SWITCH SETTINGS IN BINARY FASHION
+//  e.g. Mode 1 = x001 <-- mode switch value representation
+//                4321 <-- switch number
+//
+//  meaning: switch 1 is on, switch 2 is off, switch 3 is off, switch 4 is dont care
+// Modes:
+//  0 = 000 = Garage Mode, button light test to see if car alive!!
+//             PUSHBUTTON A - Light LEDs 0 and 1
+//             PUSHBUTTON B - Light LEDs 2 and 3
+//            -switch 4 does nothing-
+//
+//  1 = 001 = Garage Mode, forward/reverse adjust, no auto steer, terminal output
+//             POT1 = left motor speed adjust
+//             POT0 = right motor speed adjust
+//            -switch 4 does nothing-
+//
+//  2 = 010 = Garage Mode, steering adjust, no auto steer, terminal output
+//             POT 1 - Controls Servo:
+//                CCW = turn left
+//                CW = turn right
+//            -switch 4 does nothing-
+//
+//  3 = 011 = Garage Mode, Camera test, some auto steer, terminal output
+//            switch 4:
+//               OFF = normal dec data
+//                ON = o-scope mode
+//
+//  4 = 100 = Track Mode, Auto Steer, safe settings
+//            switch 4 = terminal output on/off (causes 2 second lag)
+//
+//  5 = 101 = Track Mode, Auto Steer, fast settings
+//            switch 4 = terminal output on/off (causes 2 second lag)
+//
+//  6 = 110 = future upgrades
+//
+//  7 = 111 = future upgrades
 
-void TFC_TickerUpdate() {
+/* NOTES
+Camera unmounted
+motors unhooked
+only servo / steering hooked up 
+
+exercise 1 - garage drive
+- manual motors forward / reverse
+- ensure motors hooked up properly - forward/reverse/left/right
+- show terminal value
+
+exercise 2 - garage steer
+- manual steering - left /right 
+- calibrate steering
+- show terminal to get feedback
+
+exercise 3 - garage see
+- focus camera
+- mount camera
+- camera + servo line tracking (race mode)
+garage mode use paper show following
+- bad Kp value
+- min speed = 0.5
+
+exercise 4 - track - slow
+- fine tuning max speed
+- fine tune proportional control - Kp
+
+exercise 5 - track - fast
+- ratio of differential motor speed on curves
+- dead zone with high speed on straights
+
+*/
+
+void TFC_TickerUpdate()
+{
     int i;
-
-    for(i = 0; i < NUM_TFC_TICKERS; i++) {
-        if(TFC_Ticker[i] < 0xFFFFFFFF) {
+ 
+    for(i=0; i<NUM_TFC_TICKERS; i++)
+     {
+        if(TFC_Ticker[i]<0xFFFFFFFF) 
+        {
             TFC_Ticker[i]++;
         }
     }
 }
 
- /****************** CalibrateSwitches() ****************** 
- *
- * Press button 0 or 1 and toggles
- * LED 0 1 and 2 3 respectively.
- * 
- **********************************************************/
-void CalibrateSwitches() {
-    if(TFC_PUSH_BUTTON_0_PRESSED) {
-        TFC_BAT_LED0_ON;
-        TFC_BAT_LED1_ON;
-    }
-    else {
-        TFC_BAT_LED0_OFF;
-        TFC_BAT_LED1_OFF;
-    }
+// Garage Mode
+//   Car not meant to run on track
+//   Use this to test out car features
+//   and calibrate car
+//
+void GarageMode()
+{
+  uint32_t i,j = 0;
+  float ReadPot0, ReadPot1;
 
-    if(TFC_PUSH_BUTTON_1_PRESSED) {
-        TFC_BAT_LED2_ON;
-        TFC_BAT_LED3_ON;
-    }
-    else {
-        TFC_BAT_LED2_OFF;
-        TFC_BAT_LED3_OFF;
-    }
-}
 
- /****************** CalibrateServo() ****************** 
- *
- * - Disables the HBridge
- * Read from the pot and adjust the servo accoding to
- * that value.
- * 
- *******************************************************/
-void CalibrateServo() {
-    float potValue0, potValue1;
+  //This Demo program will look at the first 2 switches to select one of 4 demo / garage modes
+  switch(TFC_GetDIP_Switch()&0x03)
+  {
+  default:
+  case 0 : // Mode 0
+      TFC_HBRIDGE_DISABLE;
 
-    TFC_HBRIDGE_DISABLE;            
-    if(TFC_Ticker[0] >= 20) { // every 40ms...
-        TFC_Ticker[0] = 0;    //reset the Ticker
-        
-        //update the Servos
-        potValue0 = TFC_ReadPot(0);
-        potValue1 = TFC_ReadPot(1);
-        TFC_SetServo(0, potValue0);
-        TFC_SetServo(1, potValue1);
-        TERMINAL_PRINTF("Pot0 = %1.2f\r\n", potValue0);
-        TERMINAL_PRINTF("Pot1 = %1.2f\r\n", potValue1);
-    }
-
-    TFC_SetBatteryLED_Level(2); // Battery level 2 indicates servo calibration
-    TFC_SetMotorPWM(0, 0);      // Make sure motors are off 
-    TFC_HBRIDGE_DISABLE;
-}
-
- /****************** CalibrateMotors() ****************** 
- *
- * - Enables the HBridge
- * Read from the two pots and adjust either left or right
- * motor speed depending on the two pot values.
- * 
- *******************************************************/
-void CalibrateMotors() {
-    float potValue0, potValue1;
-
-    TFC_HBRIDGE_ENABLE;
-    potValue0 = TFC_ReadPot(0);
-    potValue1 = TFC_ReadPot(1);
-    TERMINAL_PRINTF("Pot0 = %1.2f\n", potValue0);
-    TERMINAL_PRINTF("Pot1 = %1.2f\n", potValue1);
-    TFC_SetMotorPWM(potValue0, potValue1);
-    TFC_SetBatteryLED_Level(3); // Battery level 3 indicates servo calibration
-}
-
- /****************** CalibrateCamera() ****************** 
- *
- * Grabs ADC values from the camera and prints to Screen
- * 
- *******************************************************/
-void CalibrateCamera() {
-    uint32_t i, j, t = 0;
-    short TFC_LineScanImage_bin[128];
-
-    if(TFC_Ticker[0] > 1000 && TFC_LineScanImageReady > 0) { // every 2s ...
-        TFC_Ticker[0] = 0;
-        TFC_LineScanImageReady = 0; // must reset to 0 after detecting non-zero
-        TFC_SetBatteryLED_Level(4);
-        for(i = 0; i < 8; i++) { // print one line worth of data (128) from Camera 0
-            for(j = 0; j < 16; j++) {
-  
-                    if (TFC_LineScanImage0[(i * 16) + j] > 0x250) TFC_LineScanImage_bin[i * 16 + j] = 1;
-                    else TFC_LineScanImage_bin[i * 16 + j] = 0;
-
-                    //TERMINAL_PRINTF("0x%X", TFC_LineScanImage0[(i * 16) + j]);
-                    TERMINAL_PRINTF("%X", TFC_LineScanImage_bin[(i * 16) + j]);
-                    
-                    if((i == 7) && (j == 15)) {  // when last data reached put in line return
-                    //   TERMINAL_PRINTF("\r\n",TFC_LineScanImage0[(i * 16) + j]);
-                    }
-                    else {
-                    //   TERMINAL_PRINTF(", ",TFC_LineScanImage0[(i * 16) + j]);
-                    }
-            }
-            wait_ms(50);
-        }
-
-        for (i = 0; i < 128; ++i) {
-            TERMINAL_PRINTF("bin: %i\r\n", TFC_LineScanImage_bin[i]);
-        }
-        TERMINAL_PRINTF("\r\n");
-    }
-}
-
-/****************** ExecuteCalibration() ****************** 
- *
- * default: No default behavior defined
- * case 0: Switches - No dip switch toggled high
- * case 1: Servo - Dip switch 2 toggled high
- * case 2: Motor/PWM - Dip switch 3 toggled high
- * case 3: Camera - Dip switches 2 and 3 are toggled high
- * 
- **********************************************************/
-void ExecuteCalibration() {
-
-    switch((TFC_GetDIP_Switch() >> 1) & 0x03) {
-        default:
-
-        case 0 :
-            CalibrateSwitches();
-            break;
-        
-        case 1:
-            CalibrateServo();
-            break;
-         
-        case 2 :
-            CalibrateMotors();
-            break;
+      TERMINAL_PRINTF("MODE 0\r\n");  
+      
+      if(TFC_PUSH_BUTTON_0_PRESSED)
+      {
+          TFC_BAT_LED0_ON;
+          TFC_BAT_LED1_ON;
+      } else {
+          TFC_BAT_LED0_OFF;
+          TFC_BAT_LED1_OFF;
+      }
+      
+      if(TFC_PUSH_BUTTON_1_PRESSED)
+      {
+          TFC_BAT_LED2_ON;
+          TFC_BAT_LED3_ON;
+      } else {
+          TFC_BAT_LED2_OFF;
+          TFC_BAT_LED3_OFF;
+      }     
+      break;
+          
+  case 1 : // Mode 1
+      TFC_HBRIDGE_ENABLE;
      
-        case 3:
-            CalibrateCamera();
-            break;
-    }
+      ReadPot0 = TFC_ReadPot(0);
+      ReadPot1 = TFC_ReadPot(1);
+      TERMINAL_PRINTF("MODE 1: ");   
+      TERMINAL_PRINTF("Left drive setting = %1.2f\t\t", ReadPot1);
+      TERMINAL_PRINTF("Right drive setting = %1.2f\r\n", ReadPot0);
+      TFC_SetMotorPWM(ReadPot0,ReadPot1);
+              
+      break;
+  
+   case 2:                  
+      //Make sure motors are off 
+      TFC_SetMotorPWM(0,0);
+      TFC_HBRIDGE_DISABLE;
+
+      if(TFC_Ticker[0]>=20) // every 40mS output data to terminal
+      {
+          TFC_Ticker[0] = 0; //reset the Ticker
+          //update the Servos
+          TERMINAL_PRINTF("MODE 2: ");   
+          ReadPot0 = TFC_ReadPot(0);
+//          ReadPot1 = TFC_ReadPot(1);
+          TFC_SetServo(0,ReadPot0);
+//          TFC_SetServo(1,ReadPot1);
+          TERMINAL_PRINTF("Steer1 setting = %1.2f\r\n", ReadPot0);
+//          TERMINAL_PRINTF("Steer2 setting = %1.2f\r\n", ReadPot0);
+      }    
+      break;
+      
+   case 3 :
+      TFC_HBRIDGE_DISABLE;
+
+      if(TFC_Ticker[0]>1000 && TFC_LineScanImageReady>0) // every 1000 ticks (1s if 10ms)
+          {
+           // TERMINAL_PRINTF("MODE 3:\r\n");
+           TFC_Ticker[0] = 0;
+           TFC_LineScanImageReady=0; // must reset to 0 after detecting non-zero
+
+           if (terminalMode()) {
+             // print values to terminal as if were o-scope...
+             
+             for(j=20;j>0;j--) {
+               for(i=0;i<128;i++) {
+                 if ((TFC_LineScanImage0[i]<=(4096*j/20)) && (TFC_LineScanImage0[i]>=(4096*(j-1)/20)))
+                   TERMINAL_PRINTF("*");
+                 else
+                   TERMINAL_PRINTF(" ");
+               }
+               TERMINAL_PRINTF("\r\n");
+             }
+   
+           } else { 
+             for(i=0;i<128;i++) // print one line worth of data (128) from Camera 0
+             {
+               TERMINAL_PRINTF("%d",TFC_LineScanImage0[i]);
+              
+               if(i==127)  // when last data reached put in line return
+                 TERMINAL_PRINTF("\r\n",TFC_LineScanImage0[i]);
+               else
+                 TERMINAL_PRINTF(",",TFC_LineScanImage0[i]);               
+             }
+             TERMINAL_PRINTF("============================================================================================\r\n");
+             wait_ms(10);
+           }
+              
+                               
+                  
+          }
+          
+
+
+      break;
+  } // end case
+
 }
 
-void SetMaxSpeed() {
-    PROTO_MAX_SPEED = TFC_ReadPot(0);
-}
 
-void ExecutePrototype() {
-    if(TFC_PUSH_BUTTON_0_PRESSED) {
-        TFC_BAT_LED0_ON;
-        TFC_BAT_LED1_ON;
-        TFC_BAT_LED2_ON;
-        TFC_BAT_LED3_ON;
-        SetMaxSpeed();
 
-        TFC_HBRIDGE_ENABLE;
-        TFC_SetMotorPWM(PROTO_MAX_SPEED, PROTO_MAX_SPEED);
-    }
-
-    if(TFC_PUSH_BUTTON_1_PRESSED) {
-        TFC_BAT_LED0_OFF;
-        TFC_BAT_LED1_OFF;
-        TFC_BAT_LED2_OFF;
-        TFC_BAT_LED3_OFF;
-
-        TFC_SetMotorPWM(0, 0);
-        TFC_HBRIDGE_DISABLE;
-    }
-}
-
-int main() {
-    //PC.baud(115200); // Excel and TeraTerm 
-    PC.baud(9600);     // UNIX - screen /var/tty.usbmodem* -s 9600
-    TFC_TickerObj.attach_us(&TFC_TickerUpdate, 2000); // update ticker array every 2mS (2000 uS)
+ 
+int main()
+{
+    // TERMINAL TYPE  
+    PC.baud(115200); // works with Excel and TeraTerm 
+    //PC.baud(9600); // works with USB Serial Monitor Lite: https://play.google.com/store/apps/details?id=jp.ksksue.app.terminal; doesn't work > 9600
+    TFC_TickerObj.attach_us(&TFC_TickerUpdate,2000); // update ticker array every 2mS (2000 uS)
+   
     TFC_Init();
     
-    while(1) {      
-        //TFC_Task must be called in your main loop.  This keeps certain processing happy (I.E. Serial port queue check)
-        //TFC_Task();
-
-        // If DIP switch 1 is high, then run MCP, else Demo program
-        if(TFC_GetDIP_Switch() & 0x01) {
-            ExecuteEngine();
-            //ExecutePrototype();
-        }
-        else {     
-            ExecuteCalibration();
- 		}
-    }
+    for(;;)
+    {   
+        if(getMode() < 4)
+          // Run Garage Mode
+          GarageMode();
+        else      
+          // Run Track Mode
+          TrackMode();
+          
+    // Add wait for button press if in Terminal Mode
+   //    if(terminalMode())
+    //   {
+        // if in terminal mode, wait for button push
+    //    if(TFC_PUSH_BUTTON_0_PRESSED)
+    // 
+    //     
+    //    }
+ 
+    } // end of infinite for loop
+    
+ 
 }
+ 
