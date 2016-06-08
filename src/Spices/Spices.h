@@ -149,6 +149,7 @@ TrackType CurrentTrack; */
 //   - set starting gate flag if there
 //   - do nothing with position value otherwise
 void reviewEdgesCenterLine();
+
 void reviewEdgesEdgeLine();
 
 void resetImageProcessVars();
@@ -177,10 +178,8 @@ uint16_t getMode();
 
 bool terminalMode();
 
-
 // serves to grab a frame of camera data
 void grabCameraFrame();
-
 
 // Decide new actions based on track status
 void ActOnTrackStatus();
