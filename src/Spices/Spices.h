@@ -74,8 +74,8 @@
 #define TRACKTYPE 1                                // 0 = center line track; 1 = edge line track
 
 // Steer/Servo Params
-#define MAX_STEER_LEFT -0.42                       // value determined by demo mode 1 measure (have to be adjusted with every servo horn attach)
-#define MAX_STEER_RIGHT 0.43                       // value determined by demo mode 1 measure
+#define MAX_STEER_LEFT -0.62                       // value determined by demo mode 1 measure (have to be adjusted with every servo horn attach)
+#define MAX_STEER_RIGHT 0.16                       // value determined by demo mode 1 measure
 #define DT 0.02                                    // # MS of time between intervals (doesn't really matter)
 
 // Logging parameters

@@ -6,7 +6,13 @@
 // define commonly used global variables and constants here
 extern Serial PC;
 
-#define TERMINAL_PRINTF     PC.printf 
+#define DEBUG       (1)
+
+#if DEBUG
+#define TERMINAL_PRINTF PC.printf
+#else
+#define TERMINAL_PRINTF
+#endif
 
  //This ticker code is used to maintain compability with the Codewarrior version of the sample.   This code uses an MBED Ticker for background timing.
 #define NUM_TFC_TICKERS 4

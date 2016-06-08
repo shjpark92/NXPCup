@@ -59,87 +59,77 @@ TrackStatusType CurrentTrackStatus;                // current track status
 TrackStatusType LastTrackStatus;                   // last track status
 
 
-void resetImageProcessVars()
-{
+void resetImageProcessVars() {
    MaxLightIntensity = 0;                  // reset
    MinLightIntensity = (1 << 12);          // reset
 }
 
 // review edges for a center line track
-void reviewEdgesCenterLine()
-{
-  LastTrackStatus = CurrentTrackStatus;
+void reviewEdgesCenterLine() {
+    LastTrackStatus = CurrentTrackStatus;
   
-  if ((numPosEdges == 1) && (numNegEdges == 1))  // only one negative and positive edge found (LINE)
-  {
-    if (((PosEdges[0] - NegEdges[0]) >= MIN_LINE_WIDTH) && ((PosEdges[0] - NegEdges[0]) <= MAX_LINE_WIDTH)) // has proper expected width
-    {
-       CurrentTrackStatus = LineFound;                                   // report line found!
-       UnknownCount = 0;                                          // reset unknown status count
-       LastLinePosition = CurrentLinePosition;
-       CurrentLinePosition = (PosEdges[0]+NegEdges[0]) / 2;       // update line position
-    }
-  } else if ((numPosEdges == 1) && (numNegEdges == 0))  {     // 1 pos edge found (POSSIBLE LINE)
-    if ((PosEdges[0] <= MAX_LINE_WIDTH) && (LastLinePosError < 0))       // pos edge is within line width of edge of camera (LEFT)
-    {
-       CurrentTrackStatus = LineFound;                                   // report line found!
-       UnknownCount = 0;                                                 // reset unknown status count
-       LastLinePosition = CurrentLinePosition;
-       CurrentLinePosition = PosEdges[0] - ( MAX_LINE_WIDTH / 2);        // update line position
-     //  TERMINAL_PRINTF("*** SINGLE POSEDGE LINE FOUND AT POSITION %9.3f *** \r\n", CurrentLinePosition);
-    }
-  } else if ((numNegEdges == 1) && (numPosEdges == 0))  {     // 1 neg edge found (POSSIBLE LINE)
-    if ((NegEdges[0] >= (MAX_LINE_SCAN - MAX_LINE_WIDTH)) && (LastLinePosError > 0))    // neg edge is within line width of edge of camera (RIGHT)
-    {
-       CurrentTrackStatus = LineFound;                                   // report line found!
-       UnknownCount = 0;                                                 // reset unknown status count
-       LastLinePosition = CurrentLinePosition;
-       CurrentLinePosition = NegEdges[0] + ( MAX_LINE_WIDTH / 2);        // update line position
-    //   TERMINAL_PRINTF("*** SINGLE NEGEDGE LINE FOUND AT POSITION %9.3f *** \r\n", CurrentLinePosition);
+    if((numPosEdges == 1) && (numNegEdges == 1)) { // only one negative and positive edge found (LINE)
+        if(((PosEdges[0] - NegEdges[0]) >= MIN_LINE_WIDTH) && ((PosEdges[0] - NegEdges[0]) <= MAX_LINE_WIDTH)) { // has proper expected width
+            CurrentTrackStatus = LineFound;                                   // report line found!
+            UnknownCount = 0;                                          // reset unknown status count
+            LastLinePosition = CurrentLinePosition;
+            CurrentLinePosition = (PosEdges[0] + NegEdges[0]) / 2;       // update line position
+        }
     } 
-  } else if ((numPosEdges == 2) && (numNegEdges == 2))  {     // 2 negative and 2 positive edges found (STARTING/FINISH GATE)
-  
-    if ((((NegEdges[0] - PosEdges[0]) >= MIN_LINE_WIDTH) && ((NegEdges[0] - PosEdges[0]) <= MAX_LINE_WIDTH)) &&    // white left 'line'
-        (((NegEdges[1] - PosEdges[1]) >= MIN_LINE_WIDTH) && ((NegEdges[1] - PosEdges[1]) <= MAX_LINE_WIDTH)) &&    // white right 'line'
-        (((PosEdges[1] - NegEdges[0]) >= MIN_LINE_WIDTH) && ((PosEdges[1] - NegEdges[0]) <= MAX_LINE_WIDTH))       // actual track line
-        )
-           
-       
-    if (startRaceTicker > STARTGATEDELAY) {                      // only start counting for starting gate until after delay
-      StartGateFoundCount++;
-    }
-    
-    CurrentTrackStatus = StartGateFound;
-    UnknownCount = 0;                                            // reset unknown status count
-           
-  } else if ((numPosEdges > 1) && (numNegEdges > 1)) {   // more than 1 negative edge and positive edge found (but not 2 for both) (STARTING / FINISH GATE)
-  
-   // remove edges that aren't close to center TBD DDHH
-   
-      if (terminalOutput) {
-         TERMINAL_PRINTF("***************************************** \r\n");
-         TERMINAL_PRINTF("********** NOT SURE FOUND ********** \r\n");
-         TERMINAL_PRINTF("***************************************** \r\n");
-       } 
-    CurrentTrackStatus = Unknown; 
-  
-  } else {  // no track or starting gate found
-  
-    if (terminalOutput) {
-      TERMINAL_PRINTF("***************************************** \r\n");
-      TERMINAL_PRINTF("*** !!!!!!!!!! LINE NOT FOUND !!!!!!! *** \r\n", CurrentLinePosition);
-      TERMINAL_PRINTF("***************************************** \r\n");
-    }
-  
-    CurrentTrackStatus = Unknown;
-    UnknownCount++;
-  }
+    else if ((numPosEdges == 1) && (numNegEdges == 0))  {     // 1 pos edge found (POSSIBLE LINE)
+        if ((PosEdges[0] <= MAX_LINE_WIDTH) && (LastLinePosError < 0)) {     // pos edge is within line width of edge of camera (LEFT)
+           CurrentTrackStatus = LineFound;                                   // report line found!
+           UnknownCount = 0;                                                 // reset unknown status count
+           LastLinePosition = CurrentLinePosition;
+           CurrentLinePosition = PosEdges[0] - ( MAX_LINE_WIDTH / 2);        // update line position
+           //TERMINAL_PRINTF("*** SINGLE POSEDGE LINE FOUND AT POSITION %9.3f *** \r\n", CurrentLinePosition);
+        }
+    } 
+    else if ((numNegEdges == 1) && (numPosEdges == 0))  {     // 1 neg edge found (POSSIBLE LINE)
+        if ((NegEdges[0] >= (MAX_LINE_SCAN - MAX_LINE_WIDTH)) && (LastLinePosError > 0)) {   // neg edge is within line width of edge of camera (RIGHT)
+           CurrentTrackStatus = LineFound;                                   // report line found!
+           UnknownCount = 0;                                                 // reset unknown status count
+           LastLinePosition = CurrentLinePosition;
+           CurrentLinePosition = NegEdges[0] + ( MAX_LINE_WIDTH / 2);        // update line position
+        //   TERMINAL_PRINTF("*** SINGLE NEGEDGE LINE FOUND AT POSITION %9.3f *** \r\n", CurrentLinePosition);
+        } 
+    } 
+    else if ((numPosEdges == 2) && (numNegEdges == 2))  {     // 2 negative and 2 positive edges found (STARTING/FINISH GATE)
+        if ((((NegEdges[0] - PosEdges[0]) >= MIN_LINE_WIDTH) && ((NegEdges[0] - PosEdges[0]) <= MAX_LINE_WIDTH)) &&    // white left 'line'
+          (((NegEdges[1] - PosEdges[1]) >= MIN_LINE_WIDTH) && ((NegEdges[1] - PosEdges[1]) <= MAX_LINE_WIDTH)) &&    // white right 'line'
+          (((PosEdges[1] - NegEdges[0]) >= MIN_LINE_WIDTH) && ((PosEdges[1] - NegEdges[0]) <= MAX_LINE_WIDTH))       // actual track line
+          )
 
+        if (startRaceTicker > STARTGATEDELAY) {                      // only start counting for starting gate until after delay
+            StartGateFoundCount++;
+        }
+        
+        CurrentTrackStatus = StartGateFound;
+        UnknownCount = 0;                                            // reset unknown status count
+             
+    } 
+    else if ((numPosEdges > 1) && (numNegEdges > 1)) {   // more than 1 negative edge and positive edge found (but not 2 for both) (STARTING / FINISH GATE)
+        // remove edges that aren't close to center TBD DDHH
+        if (terminalOutput) {
+            TERMINAL_PRINTF("***************************************** \r\n");
+            TERMINAL_PRINTF("********** NOT SURE FOUND ********** \r\n");
+            TERMINAL_PRINTF("***************************************** \r\n");
+        } 
+        CurrentTrackStatus = Unknown;
+    } 
+    else {  // no track or starting gate found
+        if (terminalOutput) {
+            TERMINAL_PRINTF("***************************************** \r\n");
+            TERMINAL_PRINTF("*** !!!!!!!!!! LINE NOT FOUND !!!!!!! *** \r\n", CurrentLinePosition);
+            TERMINAL_PRINTF("***************************************** \r\n");
+        }
+        CurrentTrackStatus = Unknown;
+        UnknownCount++;
+    }
 }
 
 // review edges for an edge line track
-void reviewEdgesEdgeLine()
-{
+void reviewEdgesEdgeLine() {
   LastTrackStatus = CurrentTrackStatus;
   
   if ((numPosEdges == 1) && (numNegEdges == 0))                          // only positive edge found
@@ -511,8 +501,7 @@ void TrackMode()
   // Every 2s (or Terminal Output is off, i.e. race mode!)
   //    AND line scan image ready (or fake mode where image is always ready)
   //   (ticker updates every 10ms) (Line scan image ready every 10ms)
-  if((TFC_Ticker[0]>6000 || (!(terminalOutput || serialPlot))) && (TFC_LineScanImageReady>0 || debugFakeMode))
-   {
+  if((TFC_Ticker[0] > 6000 || (!(terminalOutput || serialPlot))) && (TFC_LineScanImageReady>0 || debugFakeMode)) {
 
      // stuff that needs to be reset with each image frame
      TFC_Ticker[0] = 0;
@@ -528,20 +517,22 @@ void TrackMode()
 
      // adjust deriv threshold based on some algo
      // has to be called before find edges
-     if (TRACKTYPE == CENTERLINE)
+     if (TRACKTYPE == CENTERLINE) {
        findDerThresholds(1);  // center line track threshold method
-     else
+     }
+     else {
        findDerThresholds(2);  // edge line track threshold method
-            
+     } 
      //find edges from derivative data
      findEdges_v2(&DerivLineScanImage0[0]);
     
      //review edge data and set position or starting flag appropriately
-     if (TRACKTYPE == CENTERLINE)     
+     if (TRACKTYPE == CENTERLINE) {     
        reviewEdgesCenterLine();
-     else
+     }
+     else {
        reviewEdgesEdgeLine();
-   
+      }
 //  *********************************************************
       
      
