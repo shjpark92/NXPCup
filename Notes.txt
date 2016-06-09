@@ -1,0 +1,56 @@
+1. Calibrate Camera focus using an oscope. The wave should look like a bandpass filter.
+
+2. Calibrate wheels so that they don't touch the chasis during sharp turns. i.e. set maximum turning angle. 
+	It is a good idea to print values corresponding to wheel angles on a serial terminal.
+
+
+3. Line Detection and Steering 
+
+ *Note that the line scan camera averages pixels in each column of a 2D image and turn it into a 1D image (Basically an array).
+  Our image was an array of 128. 
+
+  *Camera angle and height makes a huge difference 
+
+
+Version #1 (Daniel Hadad's algorithm used for competition)
+	1) Take the derivatives of the image data and look for the sharpest contrast. The largest derivative value will indicate the border between black and white (edge and track).
+	2) Find the positive and negative edge threshold values from the derivatives. pos edge = left edge->track. neg edge = track->right edge.
+		*Note that different algorithms can be used for this task.
+
+		We used the standard deviation of the derivative values to find the threshold. When the derivative values are mapped out, it looks similar to a Gaussian function.
+		The bumps in the function indicate high contrast.
+
+	3) Based on the postive and negative thresholds, find edges.
+
+	4) Apply P control using camera data.
+	5) Control speed based on line errors from P control. i.e. If the error is large = slow down. 
+
+
+Version #2 (Our own algorithm attempted to use)
+	*this first attempt only works on the setting we calibrate for.
+	1) First place the car on the track, look at the raw light intensity data using a serial terminal. Look for a relatively significant change in values, which indicates the track(white) and edges (black)
+	2) Pick a threshold and convert the line image into a binary image. The result should look like below
+
+	   	(ex) 00000000000111111111111111111111111111111111111100 - when the car is near the left edge
+	   		 00000111111111111111111111111111111111111111100000 - when the car is near the center of the track
+	   		 00111111111111111111111111111111111111000000000000 - when the car is near the right edge
+
+	3) divide the above array in half and add all the values in each side. The result will be summed value of 64 values ( [0]-[63], [64]-[127])
+	   Compare the two added values. The bigger value means the car is further away from the corresponding edge. 
+
+	4) Once we know which side the car is closer, steer the car towards the further side to stay inside of the track.
+		We applied PID control using these added values.
+
+
+
+4. Possible Future Improvements:
+		1) Use histogram to dynamically find threshold to convert the image into binary (Accuracy).
+		2) Based on the accurate histogram values, come up with an algorithm to detect curve, straight path, uphill, and downhill.
+			Control speed based on these (Performance). 
+			(ex) curve-speed down. straight:-Maximum speed. uphill-speed up, downhill-speed  down
+
+		3) Consider using a built in accelerometer on Freedom KL25Z board.
+
+		4) Consider using edge cutting algorithm to make the car to follow a shortest path (inner track).
+
+		5) Make the car stop when it finishes
