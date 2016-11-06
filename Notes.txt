@@ -51,6 +51,6 @@ Version #2 (Our own algorithm attempted to use)
 
 		3) Consider using a built in accelerometer on Freedom KL25Z board.
 
-		4) Consider using edge cutting algorithm to make the car to follow a shortest path (inner track).
+		4) Consider using cutting-edge algorithm to make the car to follow a shortest path (inner track).
 
 		5) Make the car stop when it finishes
